@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import ru.alemak.dailyquiz_.presentation.quiz.component.InitialState
 import ru.alemak.dailyquiz_.presentation.quiz.component.LoadingState
 import ru.alemak.dailyquiz_.presentation.quiz.component.QuizQuestionState
@@ -18,7 +19,7 @@ import ru.alemak.dailyquiz_.presentation.quiz.viewmodel.QuizViewModel
 
 @Composable
 fun QuizScreen(
-    viewModel: QuizViewModel,
+    viewModel: QuizViewModel = hiltViewModel(),
     onNavigateToHistory: () -> Unit,
     onNavigateToReview: (quizId: Long) -> Unit
 ) {
@@ -27,9 +28,16 @@ fun QuizScreen(
     val questions by viewModel.questions.collectAsState()
     val currentQuestionIndex by viewModel.currentQuestionIndex.collectAsState()
     val selectedAnswer by viewModel.selectedAnswer.collectAsState()
+    val score by viewModel.score.collectAsState() // ← ДОБАВЬТЕ ЭТУ СТРОКУ!
+
+    // Добавьте отладку
+    LaunchedEffect(score) {
+        println("DEBUG: Current score = $score")
+    }
 
     LaunchedEffect(navigateToId) {
         navigateToId?.let { quizId ->
+            println("DEBUG: Navigating to review with score: $score")
             onNavigateToReview(quizId)
             viewModel.onNavigationComplete()
         }
@@ -47,9 +55,17 @@ fun QuizScreen(
                 questionNumber = currentQuestionIndex + 1,
                 totalQuestions = questions.size,
                 selectedAnswer = selectedAnswer,
-                onAnswerSelected = { answer -> viewModel.selectAnswer(answer) },
-                onNextQuestion = { viewModel.nextQuestion() },
-                onBackToInitial = {viewModel.resetQuiz()}
+                onAnswerSelected = { answer ->
+                    println("DEBUG: Answer selected: $answer")
+                    viewModel.selectAnswer(answer)
+                },
+                onNextQuestion = {
+                    println("DEBUG: Next question pressed, current score: $score")
+                    viewModel.nextQuestion()
+                },
+                onBackToInitial = {
+                    viewModel.resetQuiz()
+                }
             )
         }
         else -> {
@@ -62,17 +78,4 @@ fun QuizScreen(
             )
         }
     }
-}
-
-@SuppressLint("ViewModelConstructorInComposable")
-@Preview
-@Composable
-fun QuizScreenPreview() {
-    val viewModel = QuizViewModel()
-
-    QuizScreen(
-        viewModel = viewModel,
-        onNavigateToHistory = {},
-        onNavigateToReview = {}
-    )
 }

@@ -23,7 +23,7 @@ fun AppNavigation() {
         composable("quiz") {
             val viewModel: QuizViewModel = hiltViewModel()
             QuizScreen(
-                viewModel = viewModel, // Передаем реальный ViewModel
+                viewModel = viewModel,
                 onNavigateToHistory = { navController.navigate("history") },
                 onNavigateToReview = { quizId -> navController.navigate("review/$quizId") }
             )
@@ -32,7 +32,7 @@ fun AppNavigation() {
         composable("history") {
             val viewModel: HistoryViewModel = hiltViewModel()
             HistoryScreen(
-                viewModel = viewModel, // Передаем реальный ViewModel
+                viewModel = viewModel,
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToReview = { quizId -> navController.navigate("review/$quizId") }
             )
@@ -41,9 +41,14 @@ fun AppNavigation() {
         composable("review/{quizId}") { backStackEntry ->
             val viewModel: ReviewViewModel = hiltViewModel()
             ReviewScreen(
-                viewModel = viewModel, // Передаем реальный ViewModel
+                viewModel = viewModel,
                 quizId = backStackEntry.arguments?.getString("quizId")?.toLongOrNull() ?: 0L,
-                onNavigateBack = { navController.popBackStack() }
+                onBackToInitial = {
+                    navController.navigate("quiz") {
+                        popUpTo(0) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
             )
         }
     }

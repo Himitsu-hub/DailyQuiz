@@ -9,20 +9,21 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ru.alemak.dailyquiz_.domain.model.Question
+import ru.alemak.dailyquiz_.domain.model.QuizResult
+import ru.alemak.dailyquiz_.domain.repository.QuizRepository
 import javax.inject.Inject
 
 @HiltViewModel
-class QuizViewModel @Inject constructor() : ViewModel() {
+class QuizViewModel @Inject constructor(
+    private val quizRepository: QuizRepository
+) : ViewModel() {
 
-    // Состояние загрузки
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
-    // Навигация
     private val _navigateToReview = MutableStateFlow<Long?>(null)
     val navigateToReview: StateFlow<Long?> = _navigateToReview.asStateFlow()
 
-    // Состояние викторины
     private val _questions = MutableStateFlow<List<Question>>(emptyList())
     val questions: StateFlow<List<Question>> = _questions.asStateFlow()
 
@@ -35,13 +36,25 @@ class QuizViewModel @Inject constructor() : ViewModel() {
     private val _score = MutableStateFlow(0)
     val score: StateFlow<Int> = _score.asStateFlow()
 
+    fun finishQuiz(totalQuestions: Int, onFinished: (Long) -> Unit) {
+        viewModelScope.launch {
+            val result = QuizResult(
+                quizId = System.currentTimeMillis(),
+                correctAnswers = _score.value,
+                totalQuestions = totalQuestions,
+                questions = emptyList(),
+                completedAt = System.currentTimeMillis()
+            )
+            quizRepository.saveQuizResult(result)
+            onFinished(result.quizId)
+        }
+    }
     fun startLoading() {
         viewModelScope.launch {
             _isLoading.value = true
-            delay(250) // Имитация загрузки
+            delay(250)
             _isLoading.value = false
 
-            // Загружаем тестовые вопросы (замените на реальные данные)
             loadSampleQuestions()
         }
     }
@@ -55,22 +68,18 @@ class QuizViewModel @Inject constructor() : ViewModel() {
         val currentAnswer = _selectedAnswer.value
         val currentQuestion = _questions.value.getOrNull(currentIndex)
 
-        // Проверяем ответ и увеличиваем счетчик если правильно
         if (currentAnswer == currentQuestion?.correctAnswer) {
             _score.value += 1
         }
 
         if (currentIndex < _questions.value.size - 1) {
-            // Переходим к следующему вопросу
             _currentQuestionIndex.value = currentIndex + 1
             _selectedAnswer.value = null
         } else {
-            // Викторина завершена, переходим к результатам
             completeQuiz()
         }
     }
 
-    // Функция для сброса навигации после перехода
     fun onNavigationComplete() {
         _navigateToReview.value = null
     }
@@ -84,13 +93,25 @@ class QuizViewModel @Inject constructor() : ViewModel() {
 
     private fun completeQuiz() {
         viewModelScope.launch {
-            // Здесь можно сохранить результаты в БД
-            _navigateToReview.value = 1L // ID завершенной викторины
+            val quizId = System.currentTimeMillis()
+            println("QUIZ VM: Final score = ${_score.value}")
+            println("QUIZ VM: Total questions = ${_questions.value.size}")
+
+            val result = QuizResult(
+                quizId = quizId,
+                correctAnswers = _score.value,
+                totalQuestions = _questions.value.size,
+                questions = emptyList(),
+                completedAt = System.currentTimeMillis()
+            )
+
+            println("QUIZ VM: Saving result: ${result.correctAnswers}/${result.totalQuestions}")
+            quizRepository.saveQuizResult(result)
+            _navigateToReview.value = quizId
         }
     }
 
     private fun loadSampleQuestions() {
-        // Временные тестовые вопросы (замените на реальные данные из UseCase)
         val sampleQuestions = listOf(
             Question(
                 id = "1",
@@ -115,7 +136,24 @@ class QuizViewModel @Inject constructor() : ViewModel() {
                 incorrectAnswers = listOf("Атлантический", "Индийский", "Северный Ледовитый"),
                 category = "География",
                 difficulty = "средняя"
-            )
+            ),
+            Question(
+                id = "3",
+                question = "2 + 2 = ?",
+                correctAnswer = "4",
+                incorrectAnswers = listOf("5", "3", "22"),
+                category = "Математика",
+                difficulty = "легкая"
+            ),
+            Question(
+                id = "4",
+                question = "2 + 2 = ?",
+                correctAnswer = "4",
+                incorrectAnswers = listOf("5", "3", "22"),
+                category = "Математика",
+                difficulty = "легкая"
+            ),
+
         )
         _questions.value = sampleQuestions
     }
