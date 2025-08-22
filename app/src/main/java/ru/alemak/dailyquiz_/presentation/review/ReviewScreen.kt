@@ -1,7 +1,9 @@
 package ru.alemak.dailyquiz_.presentation.review
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -11,12 +13,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import ru.alemak.dailyquiz_.R
 import ru.alemak.dailyquiz_.presentation.review.viewmodel.ReviewViewModel
 
 @Composable
@@ -47,6 +52,7 @@ fun ReviewScreen(
                 .padding(top = 225.dp)
         )
 
+
         Result(
             modifier = Modifier.align(Alignment.Center),
             correctAnswers = result.correctAnswers,
@@ -58,7 +64,8 @@ fun ReviewScreen(
 }
 data class ResultData(
     val title: String,
-    val subtitle: String
+    val subtitle: String,
+    val filledStars: Int
 )
 
 private fun getResultData(correct: Int, total: Int): ResultData {
@@ -67,27 +74,33 @@ private fun getResultData(correct: Int, total: Int): ResultData {
     return when {
         percentage == 1f -> ResultData(
             "Идеально!",
-            "$correct/$total — вы ответили на всё правильно. Это блестящий результат!"
+            "$correct/$total — вы ответили на всё правильно. Это блестящий результат!",
+            5
         )
         percentage >= 0.8f -> ResultData(
             "Почти идеально!",
-            "$correct/$total — очень близко к совершенству. Ещё один шаг!"
+            "$correct/$total — очень близко к совершенству. Ещё один шаг!",
+            4
         )
         percentage >= 0.6f -> ResultData(
             "Хороший результат!",
-            "$correct/$total — вы на верном пути. Продолжайте тренироваться!"
+            "$correct/$total — вы на верном пути. Продолжайте тренироваться!",
+            3
         )
         percentage >= 0.4f -> ResultData(
             "Есть над чем поработать",
-            "$correct/$total — не расстраивайтесь, попробуйте ещё раз!"
+            "$correct/$total — не расстраивайтесь, попробуйте ещё раз!",
+            2
         )
         percentage >= 0.2f -> ResultData(
             "Сложный вопрос?",
-            "$correct/$total — иногда просто не ваш день. Следующая попытка будет лучше!"
+            "$correct/$total — иногда просто не ваш день. Следующая попытка будет лучше!",
+            1
         )
         else -> ResultData(
             "Бывает и так!",
-            "$correct/$total — не отчаивайтесь. Начните заново!"
+            "$correct/$total — не отчаивайтесь. Начните заново!",
+            0
         )
     }
 }
@@ -104,6 +117,10 @@ private fun TitleTextReview(modifier: Modifier = Modifier) {
         color = Color.White
     )
 }
+
+
+
+
 
 @Composable
 private fun Result(
@@ -128,6 +145,12 @@ private fun Result(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            StarRating(
+                filledStars = resultData.filledStars,
+                totalStars = 5,
+                starSize = 52.dp,
+            )
+
             Text(
                 text = "$correctAnswers из $totalQuestions",
                 fontSize = 16.sp,
@@ -136,7 +159,6 @@ private fun Result(
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = resultData.title,
@@ -177,6 +199,33 @@ private fun Result(
     }
 }
 
+
+
+@Composable
+fun StarRating(
+    filledStars: Int,
+    totalStars: Int = 5,
+    starSize: Dp = 52.dp,
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        repeat(totalStars) { index ->
+            val starResource = if (index < filledStars) {
+                R.drawable.star_filled
+            } else {
+                R.drawable.star_empty
+            }
+
+            Image(
+                painter = painterResource(id = starResource),
+                contentDescription = if (index < filledStars) "Filled star" else "Empty star",
+                modifier = Modifier.size(starSize)
+            )
+        }
+    }
+}
 @Preview(showBackground = true)
 @Composable
 fun ReviewScreenPreview() {
@@ -199,3 +248,5 @@ fun ReviewScreenPreview() {
         }
     }
 }
+
+
