@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -22,8 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import ru.alemak.dailyquiz_.R
+import ru.alemak.dailyquiz_.presentation.review.component.QuizCardStub
 import ru.alemak.dailyquiz_.presentation.review.viewmodel.ReviewViewModel
-
 @Composable
 fun ReviewScreen(
     modifier: Modifier = Modifier,
@@ -37,31 +38,42 @@ fun ReviewScreen(
         viewModel.loadQuizResult(quizId)
     }
 
-    Box(
+    val result = quizResult ?: return
+
+    val resultData = getResultData(result.correctAnswers, result.totalQuestions)
+
+    LazyColumn(
         modifier = modifier
             .fillMaxSize()
             .background(Color(0xFF6200EE))
+            .padding(top = 40.dp, bottom = 40.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        val result = quizResult ?: return@Box
+        item {
+            TitleTextReview()
+        }
 
-        val resultData = getResultData(result.correctAnswers, result.totalQuestions)
+        item {
+            Result(
+                correctAnswers = result.correctAnswers,
+                totalQuestions = result.totalQuestions,
+                resultData = resultData,
+                onBackToInitial = onBackToInitial,
+            )
+        }
 
-        TitleTextReview(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 225.dp)
-        )
-
-
-        Result(
-            modifier = Modifier.align(Alignment.Center),
-            correctAnswers = result.correctAnswers,
-            totalQuestions = result.totalQuestions,
-            resultData = resultData,
-            onBackToInitial = onBackToInitial,
-        )
+        items(5) { index ->
+            QuizCardStub(
+                questionNumber = index + 1,
+                totalQuestions = 5
+            )
+        }
     }
 }
+
+
+
 data class ResultData(
     val title: String,
     val subtitle: String,
