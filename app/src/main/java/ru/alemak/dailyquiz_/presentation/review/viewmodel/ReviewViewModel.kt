@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import ru.alemak.dailyquiz_.domain.model.Question
 import ru.alemak.dailyquiz_.domain.model.QuizResult
 import ru.alemak.dailyquiz_.domain.repository.QuizRepository
 import javax.inject.Inject
@@ -25,6 +26,8 @@ class ReviewViewModel @Inject constructor(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
 
+    private val _questions = MutableStateFlow<List<Question>>(emptyList())
+    val questions: StateFlow<List<Question>> = _questions.asStateFlow()
     fun loadQuizResult(quizId: Long) {
         viewModelScope.launch {
             _isLoading.value = true
@@ -33,9 +36,11 @@ class ReviewViewModel @Inject constructor(
             try {
                 val result = quizRepository.getQuizResult(quizId)
                 _quizResult.value = result
+                _questions.value = result.questions // ← Сохраняем вопросы
             } catch (e: Exception) {
                 _error.value = "Не удалось загрузить результаты: ${e.message}"
                 _quizResult.value = createFallbackResult(quizId)
+                _questions.value = emptyList()
             } finally {
                 _isLoading.value = false
             }

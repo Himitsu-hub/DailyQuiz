@@ -9,7 +9,7 @@ import ru.alemak.dailyquiz_.data.local.entity.QuizResultEntity
 
 @Database(
     entities = [QuizResultEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class QuizDatabase : RoomDatabase() {
@@ -22,10 +22,12 @@ abstract class QuizDatabase : RoomDatabase() {
         fun getDatabase(context: Context): QuizDatabase {
             return Instance ?: synchronized(this) {
                 Room.databaseBuilder(
-                    context,
+                    context.applicationContext,
                     QuizDatabase::class.java,
                     "quiz_database"
-                ).build().also { Instance = it }
+                )
+                    .fallbackToDestructiveMigration()   // ← добавь эту строку
+                    .build()
             }
         }
     }

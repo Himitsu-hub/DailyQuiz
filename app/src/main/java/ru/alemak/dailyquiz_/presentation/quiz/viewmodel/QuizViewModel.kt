@@ -101,7 +101,7 @@ class QuizViewModel @Inject constructor(
                 quizId = quizId,
                 correctAnswers = _score.value,
                 totalQuestions = _questions.value.size,
-                questions = emptyList(),
+                questions = _questions.value,
                 completedAt = System.currentTimeMillis()
             )
 
@@ -118,40 +118,31 @@ class QuizViewModel @Inject constructor(
                 question = "Столица Франции?",
                 correctAnswer = "Париж",
                 incorrectAnswers = listOf("Лондон", "Берлин", "Мадрид"),
-                category = "География",
-                difficulty = "легкая"
             ),
             Question(
                 id = "2",
                 question = "2 + 2 = ?",
                 correctAnswer = "4",
                 incorrectAnswers = listOf("5", "3", "22"),
-                category = "Математика",
-                difficulty = "легкая"
             ),
             Question(
                 id = "3",
                 question = "Самый большой океан?",
                 correctAnswer = "Тихий",
                 incorrectAnswers = listOf("Атлантический", "Индийский", "Северный Ледовитый"),
-                category = "География",
-                difficulty = "средняя"
             ),
             Question(
                 id = "3",
                 question = "2 + 2 = ?",
                 correctAnswer = "4",
                 incorrectAnswers = listOf("5", "3", "22"),
-                category = "Математика",
-                difficulty = "легкая"
             ),
             Question(
                 id = "4",
                 question = "2 + 2 = ?",
                 correctAnswer = "4",
                 incorrectAnswers = listOf("5", "3", "22"),
-                category = "Математика",
-                difficulty = "легкая"
+
             ),
 
         )

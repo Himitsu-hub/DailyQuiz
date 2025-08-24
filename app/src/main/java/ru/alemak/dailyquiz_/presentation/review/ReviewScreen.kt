@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -39,7 +40,10 @@ fun ReviewScreen(
     }
 
     val result = quizResult ?: return
-
+    LaunchedEffect(result) {
+        println("ReviewScreen: questions.size = ${result.questions.size}")
+    }
+    val questions = viewModel.questions.collectAsState().value
     val resultData = getResultData(result.correctAnswers, result.totalQuestions)
 
     LazyColumn(
@@ -63,10 +67,12 @@ fun ReviewScreen(
             )
         }
 
-        items(5) { index ->
+
+        items(questions) { question ->
             QuizCardStub(
-                questionNumber = index + 1,
-                totalQuestions = 5
+                question = question,
+                questionNumber = questions.indexOf(question) + 1,
+                totalQuestions = questions.size
             )
         }
     }
