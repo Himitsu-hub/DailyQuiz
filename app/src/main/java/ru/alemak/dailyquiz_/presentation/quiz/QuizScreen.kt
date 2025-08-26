@@ -28,9 +28,8 @@ fun QuizScreen(
     val answeredQuestions by viewModel.answeredQuestions.collectAsState()
     val currentQuestionIndex by viewModel.currentQuestionIndex.collectAsState()
     val selectedAnswer by viewModel.selectedAnswer.collectAsState()
-    val score by viewModel.score.collectAsState() // ← ДОБАВЬТЕ ЭТУ СТРОКУ!
+    val score by viewModel.score.collectAsState()
 
-    // Добавьте отладку
     LaunchedEffect(score) {
         println("DEBUG: Current score = $score")
     }

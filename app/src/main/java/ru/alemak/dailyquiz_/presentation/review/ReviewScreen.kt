@@ -77,6 +77,11 @@ fun ReviewScreen(
                 totalQuestions   = result.answeredQuestions.size
             )
         }
+
+        item {
+            RestartButton(onBackToInitial = onBackToInitial)
+        }
+
     }
 }
 
@@ -246,6 +251,32 @@ fun StarRating(
         }
     }
 }
+
+@Composable
+fun RestartButton(
+    onBackToInitial: () -> Unit,
+){
+
+    Button(
+        onClick = onBackToInitial,
+        modifier = Modifier
+            .width(260.dp)
+            .height(50.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.White
+        )
+    ) {
+        Text(
+            text = "НАЧАТЬ ЗАНОВО",
+            color = Color(0xFF2B0063),
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+
 @Preview(showBackground = true)
 @Composable
 fun ReviewScreenPreview() {

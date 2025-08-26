@@ -11,37 +11,42 @@ import ru.alemak.dailyquiz_.presentation.quiz.QuizScreen
 import ru.alemak.dailyquiz_.presentation.quiz.viewmodel.QuizViewModel
 import ru.alemak.dailyquiz_.presentation.review.ReviewScreen
 import ru.alemak.dailyquiz_.presentation.review.viewmodel.ReviewViewModel
-
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
+    val quizViewModel: QuizViewModel = hiltViewModel() // единый экземпляр
 
     NavHost(
         navController = navController,
         startDestination = "quiz"
     ) {
         composable("quiz") {
-            val viewModel: QuizViewModel = hiltViewModel()
             QuizScreen(
-                viewModel = viewModel,
+                viewModel = quizViewModel,
                 onNavigateToHistory = { navController.navigate("history") },
                 onNavigateToReview = { quizId -> navController.navigate("review/$quizId") }
             )
         }
 
         composable("history") {
-            val viewModel: HistoryViewModel = hiltViewModel()
+            val historyViewModel: HistoryViewModel = hiltViewModel()
             HistoryScreen(
-                viewModel = viewModel,
+                viewModel = historyViewModel,
                 onNavigateBack = { navController.popBackStack() },
-                onNavigateToReview = { quizId -> navController.navigate("review/$quizId") }
+                onNavigateToReview = { quizId -> navController.navigate("review/$quizId") },
+                onStartQuiz = {
+                    // 1. Возвращаемся к QuizScreen
+                    navController.popBackStack("quiz", inclusive = false)
+                    // 2. Сразу запускаем квиз
+                    quizViewModel.resetAndStartQuiz()
+                }
             )
         }
 
         composable("review/{quizId}") { backStackEntry ->
-            val viewModel: ReviewViewModel = hiltViewModel()
+            val reviewViewModel: ReviewViewModel = hiltViewModel()
             ReviewScreen(
-                viewModel = viewModel,
+                viewModel = reviewViewModel,
                 quizId = backStackEntry.arguments?.getString("quizId")?.toLongOrNull() ?: 0L,
                 onBackToInitial = {
                     navController.navigate("quiz") {

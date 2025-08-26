@@ -58,6 +58,13 @@ class QuizViewModel @Inject constructor(
         }
     }
 
+    fun resetAndStartQuiz() {
+        _currentQuestionIndex.value = 0
+        _score.value = 0
+        _selectedAnswer.value = null
+        _answeredQuestions.value = emptyList()
+        startLoading()
+    }
     fun selectAnswer(answer: String) {
         _selectedAnswer.value = answer
     }

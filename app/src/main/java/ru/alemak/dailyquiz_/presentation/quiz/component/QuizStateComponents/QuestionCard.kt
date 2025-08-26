@@ -28,7 +28,7 @@ import ru.alemak.dailyquiz_.ui.theme.QuestionColor
 
 @Composable
 fun QuestionCard(
-    answeredQuestion: AnsweredQuestion,   // ← новый параметр
+    answeredQuestion: AnsweredQuestion,
     questionNumber: Int,
     totalQuestions: Int,
     selectedAnswer: String?,

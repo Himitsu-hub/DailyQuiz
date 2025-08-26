@@ -10,7 +10,7 @@ object Converters {
 
     private const val SEP_Q      = "|"
     private const val SEP_LIST   = ";;"
-    private const val SEP_OPT    = "§§"      // ← новый разделитель для options
+    private const val SEP_OPT    = "§§"
     private const val SEP_RECORD = "@@@"
 
     @TypeConverter

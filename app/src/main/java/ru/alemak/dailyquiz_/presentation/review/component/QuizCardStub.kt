@@ -66,12 +66,24 @@ fun QuizCardStub(
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text(
-                text = "Вопрос $questionNumber из $totalQuestions",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Gray
-            )
+            Row {
+                Text(
+                    text = "Вопрос $questionNumber из $totalQuestions",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Gray
+                )
+
+                Image(
+                    painter = painterResource(
+                        id = if (answeredQuestion.question.correctAnswer == answeredQuestion.userAnswer){ R.drawable.correct_answer}
+                        else {R.drawable.incorrect_answer}),
+                    contentDescription = if (answeredQuestion.question.correctAnswer == answeredQuestion.userAnswer){"Correct Answer"}
+                    else{"Incorrect answer"},
+                    modifier = Modifier.padding(start = 140.dp).size(20.dp)
+                )
+
+            }
 
             Text(
                 text = answeredQuestion.question.question,
@@ -85,10 +97,25 @@ fun QuizCardStub(
             Spacer(modifier = Modifier.height(8.dp))
 
             allAnswers.forEach { answer ->
+
+                val isSelected = answer == answeredQuestion.userAnswer
+                val isCorrect  = answer == answeredQuestion.question.correctAnswer
                 Card(
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5)),
-                    border = BorderStroke(1.dp, Color(0xFFE0E0E0)),
+                    colors = CardDefaults.cardColors(
+                        containerColor = when {
+                            isSelected -> Color(0xFFFFFFFF)
+                            else -> Color(0xFFF3F3F3)
+                        }
+                    ),
+                    border = BorderStroke(
+                        1.dp,
+                        color = when {
+                                isSelected && isCorrect -> Color(0xFF00AE3A)
+                                isSelected && !isCorrect -> Color(0xFFE70000)
+                                else -> Color(0xFFF5F5F5)
+                        }
+                    ),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 4.dp)
@@ -100,8 +127,14 @@ fun QuizCardStub(
                             .padding(horizontal = 12.dp, vertical = 12.dp)
                     ) {
                         Image(
-                            painter = painterResource(id = R.drawable.radio_button_default),
-                            contentDescription = "Option",
+                            painter = painterResource(
+                                id = when {
+                                    isSelected && isCorrect-> R.drawable.correct_answer
+                                    isSelected && !isCorrect -> R.drawable.incorrect_answer
+                                    else -> R.drawable.radio_button_default
+                                }
+                            ),
+                            contentDescription = null,
                             modifier = Modifier
                                 .padding(end = 10.dp)
                                 .size(20.dp)
@@ -109,7 +142,8 @@ fun QuizCardStub(
                         Text(
                             text = answer,
                             fontSize = 16.sp,
-                            color = Color.Black
+                            color = Color.Black,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                         )
                     }
                 }
