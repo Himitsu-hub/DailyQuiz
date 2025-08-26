@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!--   ⚡  Не забудь включить доступ в Интернет   -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".DailyQuizApp"
         android:allowBackup="true"
@@ -13,7 +16,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DailyQuiz_">
 
-        <!-- ДОБАВЬТЕ ЭТОТ ПРОВАЙДЕР ДЛЯ WorkManager -->
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"

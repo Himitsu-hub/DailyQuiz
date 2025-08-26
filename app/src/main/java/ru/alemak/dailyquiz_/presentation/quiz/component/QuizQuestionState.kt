@@ -23,6 +23,8 @@ import ru.alemak.dailyquiz_.R
 import ru.alemak.dailyquiz_.domain.model.Question
 import ru.alemak.dailyquiz_.presentation.quiz.component.QuizStateComponents.QuestionCard
 
+
+
 @Composable
 fun QuizQuestionState(
     modifier: Modifier = Modifier,

@@ -3,16 +3,25 @@ package ru.alemak.dailyquiz_.data.repository
 import ru.alemak.dailyquiz_.data.local.dao.QuizResultDao
 import ru.alemak.dailyquiz_.data.local.entity.toDomain
 import ru.alemak.dailyquiz_.data.local.entity.toEntity
+import ru.alemak.dailyquiz_.domain.model.Question
 import ru.alemak.dailyquiz_.domain.model.QuizResult
 import ru.alemak.dailyquiz_.domain.repository.QuizRepository
+import ru.alemak.dailyquiz_.domain.repository.RemoteQuizRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class QuizRepositoryImpl @Inject constructor(
-    private val quizResultDao: QuizResultDao
+    private val quizResultDao: QuizResultDao,
+    private val remoteQuizRepository: RemoteQuizRepository
 ) : QuizRepository {
 
+    // --- ВОПРОСЫ ---
+    override suspend fun fetchQuestions(): List<Question> {
+        return remoteQuizRepository.fetchQuestions()
+    }
+
+    // --- РЕЗУЛЬТАТЫ ---
     override suspend fun getQuizResult(quizId: Long): QuizResult {
         println("REPO: Getting result for quizId: $quizId")
         val entity = quizResultDao.getByQuizId(quizId)
@@ -38,10 +47,10 @@ class QuizRepositoryImpl @Inject constructor(
     private fun createDefaultResult(quizId: Long): QuizResult {
         return QuizResult(
             quizId = quizId,
-            correctAnswers = 2,
-            totalQuestions = 5,
+            correctAnswers = 0,
+            totalQuestions = 0,
             questions = emptyList(),
-            completedAt = System.currentTimeMillis()
+            completedAt = quizId
         )
     }
 }

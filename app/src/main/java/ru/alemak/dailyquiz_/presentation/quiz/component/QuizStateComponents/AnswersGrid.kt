@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import coil.size.Size
 import ru.alemak.dailyquiz_.R
 import ru.alemak.dailyquiz_.domain.model.Question
 import ru.alemak.dailyquiz_.ui.theme.BorderColor
@@ -29,7 +28,8 @@ import ru.alemak.dailyquiz_.ui.theme.BorderColor
 fun AnswersGrid(
     question: Question,
     selectedAnswer: String?,
-    onAnswerSelected: (String) -> Unit
+    onAnswerSelected: (String) -> Unit,
+    modifier: Modifier
 ) {
     val allAnswers = remember(question) {
         (question.incorrectAnswers + question.correctAnswer).shuffled()

@@ -49,13 +49,18 @@ class QuizViewModel @Inject constructor(
             onFinished(result.quizId)
         }
     }
+
     fun startLoading() {
         viewModelScope.launch {
             _isLoading.value = true
-            delay(250)
-            _isLoading.value = false
-
-            loadSampleQuestions()
+            try {
+                val questions = quizRepository.fetchQuestions()
+                _questions.value = questions
+            } catch (e: Exception) {
+                println("Ошибка загрузки вопросов: ${e.message}")
+            } finally {
+                _isLoading.value = false
+            }
         }
     }
 
@@ -109,43 +114,5 @@ class QuizViewModel @Inject constructor(
             quizRepository.saveQuizResult(result)
             _navigateToReview.value = quizId
         }
-    }
-
-    private fun loadSampleQuestions() {
-        val sampleQuestions = listOf(
-            Question(
-                id = "1",
-                question = "Столица Франции?",
-                correctAnswer = "Париж",
-                incorrectAnswers = listOf("Лондон", "Берлин", "Мадрид"),
-            ),
-            Question(
-                id = "2",
-                question = "2 + 2 = ?",
-                correctAnswer = "4",
-                incorrectAnswers = listOf("5", "3", "22"),
-            ),
-            Question(
-                id = "3",
-                question = "Самый большой океан?",
-                correctAnswer = "Тихий",
-                incorrectAnswers = listOf("Атлантический", "Индийский", "Северный Ледовитый"),
-            ),
-            Question(
-                id = "3",
-                question = "2 + 2 = ?",
-                correctAnswer = "4",
-                incorrectAnswers = listOf("5", "3", "22"),
-            ),
-            Question(
-                id = "4",
-                question = "2 + 2 = ?",
-                correctAnswer = "4",
-                incorrectAnswers = listOf("5", "3", "22"),
-
-            ),
-
-        )
-        _questions.value = sampleQuestions
     }
 }

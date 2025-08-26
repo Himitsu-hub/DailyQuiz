@@ -55,7 +55,9 @@ fun ReviewScreen(
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         item {
-            TitleTextReview()
+            TitleTextReview(
+                modifier = Modifier.padding(top = 80.dp)
+            )
         }
 
         item {

@@ -1,14 +1,13 @@
 package ru.alemak.dailyquiz_.presentation.quiz.component.QuizStateComponents
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -26,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import ru.alemak.dailyquiz_.domain.model.Question
 import ru.alemak.dailyquiz_.ui.theme.QuestionColor
 
+
 @Composable
 fun QuestionCard(
     question: Question,
@@ -42,47 +42,62 @@ fun QuestionCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         modifier = modifier
             .fillMaxWidth()
-            .wrapContentHeight()
+            .height(548.dp)
             .padding(horizontal = 20.dp)
-            .size(width = 320.dp, height = 548.dp)
-
     ) {
-        Column(
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .fillMaxSize()
+                .padding(24.dp)
         ) {
-            Text(
-                text = "Вопрос $questionNumber из $totalQuestions",
-                textAlign = TextAlign.Center,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = QuestionColor
-            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.TopCenter)
+            ) {
+                Text(
+                    text = "Вопрос $questionNumber из $totalQuestions",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = QuestionColor
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = question.question,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    textAlign = TextAlign.Center,
+                    maxLines = 3,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
 
-            Text(
-                text = question.question,
-                textAlign = TextAlign.Center,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
-            )
-            Spacer(modifier = Modifier.height(15.dp))
-            AnswersGrid(
-                question = question,
-                selectedAnswer = selectedAnswer,
-                onAnswerSelected = onAnswerSelected
-            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 120.dp)
+            ) {
+                AnswersGrid(
+                    question = question,
+                    selectedAnswer = selectedAnswer,
+                    onAnswerSelected = onAnswerSelected,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(220.dp)
+                )
+            }
 
-            Spacer(modifier = Modifier.height(60.dp))
+
             Button(
                 onClick = onNextQuestion,
                 enabled = selectedAnswer != null,
                 modifier = Modifier
-                    .width(320.dp)
-                    .height(56.dp),
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .align(Alignment.BottomCenter),
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = if (selectedAnswer != null) Color(0xFF6200EE) else Color(0xFFE0E0E0)
