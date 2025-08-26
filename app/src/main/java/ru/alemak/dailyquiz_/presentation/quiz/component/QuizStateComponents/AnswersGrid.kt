@@ -26,14 +26,12 @@ import ru.alemak.dailyquiz_.ui.theme.BorderColor
 
 @Composable
 fun AnswersGrid(
-    question: Question,
+    options: List<String>,
     selectedAnswer: String?,
     onAnswerSelected: (String) -> Unit,
     modifier: Modifier
-) {
-    val allAnswers = remember(question) {
-        (question.incorrectAnswers + question.correctAnswer).shuffled()
-    }
+){
+    val allAnswers = options
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         allAnswers.forEach { answer ->

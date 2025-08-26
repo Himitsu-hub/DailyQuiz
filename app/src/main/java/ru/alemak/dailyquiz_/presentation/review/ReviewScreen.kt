@@ -41,9 +41,9 @@ fun ReviewScreen(
 
     val result = quizResult ?: return
     LaunchedEffect(result) {
-        println("ReviewScreen: questions.size = ${result.questions.size}")
+        println("ReviewScreen: questions.size = ${result.answeredQuestions.size}")
     }
-    val questions = viewModel.questions.collectAsState().value
+    val answeredQuestions = result.answeredQuestions
     val resultData = getResultData(result.correctAnswers, result.totalQuestions)
 
     LazyColumn(
@@ -70,11 +70,11 @@ fun ReviewScreen(
         }
 
 
-        items(questions) { question ->
+        items(result.answeredQuestions) { answered ->
             QuizCardStub(
-                question = question,
-                questionNumber = questions.indexOf(question) + 1,
-                totalQuestions = questions.size
+                answeredQuestion = answered,
+                questionNumber   = result.answeredQuestions.indexOf(answered) + 1,
+                totalQuestions   = result.answeredQuestions.size
             )
         }
     }

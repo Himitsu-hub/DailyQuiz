@@ -20,6 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ru.alemak.dailyquiz_.R
+import ru.alemak.dailyquiz_.domain.model.AnsweredQuestion
 import ru.alemak.dailyquiz_.domain.model.Question
 import ru.alemak.dailyquiz_.presentation.quiz.component.QuizStateComponents.QuestionCard
 
@@ -28,7 +29,7 @@ import ru.alemak.dailyquiz_.presentation.quiz.component.QuizStateComponents.Ques
 @Composable
 fun QuizQuestionState(
     modifier: Modifier = Modifier,
-    question: Question,
+    answeredQuestion: AnsweredQuestion,
     questionNumber: Int,
     totalQuestions: Int,
     selectedAnswer: String?,
@@ -74,17 +75,14 @@ fun QuizQuestionState(
 
 
         QuestionCard(
-            question = question,
+            answeredQuestion = answeredQuestion,
             questionNumber = questionNumber,
             totalQuestions = totalQuestions,
             selectedAnswer = selectedAnswer,
             onAnswerSelected = onAnswerSelected,
             onNextQuestion = onNextQuestion,
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 190.dp)
-
         )
+
 
         FooterText(
             modifier = Modifier

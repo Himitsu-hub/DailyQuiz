@@ -21,6 +21,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,19 +32,25 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ru.alemak.dailyquiz_.R
+import ru.alemak.dailyquiz_.domain.model.AnsweredQuestion
 import ru.alemak.dailyquiz_.domain.model.Question
 
 
 @Composable
 fun QuizCardStub(
-    question: Question,
+    answeredQuestion: AnsweredQuestion,
     questionNumber: Int,
     totalQuestions: Int,
     modifier: Modifier = Modifier
 ) {
-    val allAnswers = remember(question) {
-        (question.incorrectAnswers + question.correctAnswer).shuffled()
+    LaunchedEffect(Unit) {
+        println("QuizCardStub: ${answeredQuestion.question.question}")
+        println("QuizCardStub options:")
+        answeredQuestion.options.forEachIndexed { i, s ->
+            println("${i + 1}. $s")
+        }
     }
+    val allAnswers = answeredQuestion.options
 
     Card(
         shape = RoundedCornerShape(40.dp),
@@ -67,7 +74,7 @@ fun QuizCardStub(
             )
 
             Text(
-                text = question.question,
+                text = answeredQuestion.question.question,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black,

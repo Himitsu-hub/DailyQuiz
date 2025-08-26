@@ -25,7 +25,7 @@ fun QuizScreen(
 ) {
     val isLoading by viewModel.isLoading.collectAsState()
     val navigateToId by viewModel.navigateToReview.collectAsState()
-    val questions by viewModel.questions.collectAsState()
+    val answeredQuestions by viewModel.answeredQuestions.collectAsState()
     val currentQuestionIndex by viewModel.currentQuestionIndex.collectAsState()
     val selectedAnswer by viewModel.selectedAnswer.collectAsState()
     val score by viewModel.score.collectAsState() // ← ДОБАВЬТЕ ЭТУ СТРОКУ!
@@ -42,40 +42,25 @@ fun QuizScreen(
             viewModel.onNavigationComplete()
         }
     }
-
     when {
-        isLoading -> {
-            LoadingState(Modifier.fillMaxSize())
-        }
-        questions.isNotEmpty() -> {
-            val currentQuestion = questions[currentQuestionIndex]
+        isLoading -> LoadingState(Modifier.fillMaxSize())
+        answeredQuestions.isNotEmpty() -> {
+            val currentQ = answeredQuestions[currentQuestionIndex]
             QuizQuestionState(
                 modifier = Modifier.fillMaxSize(),
-                question = currentQuestion,
+                answeredQuestion = currentQ,
                 questionNumber = currentQuestionIndex + 1,
-                totalQuestions = questions.size,
-                selectedAnswer = selectedAnswer,
-                onAnswerSelected = { answer ->
-                    println("DEBUG: Answer selected: $answer")
-                    viewModel.selectAnswer(answer)
-                },
-                onNextQuestion = {
-                    println("DEBUG: Next question pressed, current score: $score")
-                    viewModel.nextQuestion()
-                },
-                onBackToInitial = {
-                    viewModel.resetQuiz()
-                }
+                totalQuestions   = answeredQuestions.size,
+                selectedAnswer   = selectedAnswer,
+                onAnswerSelected = viewModel::selectAnswer,
+                onNextQuestion   = viewModel::nextQuestion,
+                onBackToInitial  = viewModel::resetQuiz
             )
         }
-        else -> {
-            InitialState(
-                modifier = Modifier.fillMaxSize(),
-                onStartQuiz = {
-                    viewModel.startLoading()
-                },
-                onNavigateToHistory = onNavigateToHistory
-            )
-        }
+        else -> InitialState(
+            modifier = Modifier.fillMaxSize(),
+            onStartQuiz       = viewModel::startLoading,
+            onNavigateToHistory = onNavigateToHistory
+        )
     }
 }

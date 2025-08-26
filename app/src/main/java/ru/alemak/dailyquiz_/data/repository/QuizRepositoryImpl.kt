@@ -49,7 +49,7 @@ class QuizRepositoryImpl @Inject constructor(
             quizId = quizId,
             correctAnswers = 0,
             totalQuestions = 0,
-            questions = emptyList(),
+            answeredQuestions = emptyList(),
             completedAt = quizId
         )
     }

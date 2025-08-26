@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import ru.alemak.dailyquiz_.domain.model.AnsweredQuestion
 import ru.alemak.dailyquiz_.domain.model.Question
 import ru.alemak.dailyquiz_.domain.model.QuizResult
 import ru.alemak.dailyquiz_.domain.repository.QuizRepository
@@ -24,8 +25,9 @@ class QuizViewModel @Inject constructor(
     private val _navigateToReview = MutableStateFlow<Long?>(null)
     val navigateToReview: StateFlow<Long?> = _navigateToReview.asStateFlow()
 
-    private val _questions = MutableStateFlow<List<Question>>(emptyList())
-    val questions: StateFlow<List<Question>> = _questions.asStateFlow()
+
+    private val _answeredQuestions = MutableStateFlow<List<AnsweredQuestion>>(emptyList())
+    val answeredQuestions: StateFlow<List<AnsweredQuestion>> = _answeredQuestions.asStateFlow()
 
     private val _currentQuestionIndex = MutableStateFlow(0)
     val currentQuestionIndex: StateFlow<Int> = _currentQuestionIndex.asStateFlow()
@@ -36,26 +38,18 @@ class QuizViewModel @Inject constructor(
     private val _score = MutableStateFlow(0)
     val score: StateFlow<Int> = _score.asStateFlow()
 
-    fun finishQuiz(totalQuestions: Int, onFinished: (Long) -> Unit) {
-        viewModelScope.launch {
-            val result = QuizResult(
-                quizId = System.currentTimeMillis(),
-                correctAnswers = _score.value,
-                totalQuestions = totalQuestions,
-                questions = emptyList(),
-                completedAt = System.currentTimeMillis()
-            )
-            quizRepository.saveQuizResult(result)
-            onFinished(result.quizId)
-        }
-    }
-
     fun startLoading() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val questions = quizRepository.fetchQuestions()
-                _questions.value = questions
+                val rawQuestions = quizRepository.fetchQuestions()
+                _answeredQuestions.value = rawQuestions.map { q ->
+                    val options = (listOf(q.correctAnswer) + q.incorrectAnswers).shuffled()
+                    AnsweredQuestion(
+                        question = q,
+                        options = options
+                    )
+                }
             } catch (e: Exception) {
                 println("Ошибка загрузки вопросов: ${e.message}")
             } finally {
@@ -70,14 +64,21 @@ class QuizViewModel @Inject constructor(
 
     fun nextQuestion() {
         val currentIndex = _currentQuestionIndex.value
-        val currentAnswer = _selectedAnswer.value
-        val currentQuestion = _questions.value.getOrNull(currentIndex)
+        val currentAnswer = _selectedAnswer.value ?: return
 
-        if (currentAnswer == currentQuestion?.correctAnswer) {
+        val updated = _answeredQuestions.value.toMutableList()
+        val old = updated[currentIndex]
+        updated[currentIndex] = old.copy(
+            userAnswer = currentAnswer,
+            isCorrect = currentAnswer == old.question.correctAnswer
+        )
+        _answeredQuestions.value = updated
+
+        if (currentAnswer == old.question.correctAnswer) {
             _score.value += 1
         }
 
-        if (currentIndex < _questions.value.size - 1) {
+        if (currentIndex < _answeredQuestions.value.size - 1) {
             _currentQuestionIndex.value = currentIndex + 1
             _selectedAnswer.value = null
         } else {
@@ -93,26 +94,22 @@ class QuizViewModel @Inject constructor(
         _currentQuestionIndex.value = 0
         _selectedAnswer.value = null
         _score.value = 0
-        _questions.value = emptyList()
+        _answeredQuestions.value = emptyList()
     }
 
     private fun completeQuiz() {
         viewModelScope.launch {
             val quizId = System.currentTimeMillis()
-            println("QUIZ VM: Final score = ${_score.value}")
-            println("QUIZ VM: Total questions = ${_questions.value.size}")
-
             val result = QuizResult(
                 quizId = quizId,
                 correctAnswers = _score.value,
-                totalQuestions = _questions.value.size,
-                questions = _questions.value,
+                totalQuestions = _answeredQuestions.value.size,
+                answeredQuestions = _answeredQuestions.value,
                 completedAt = System.currentTimeMillis()
             )
-
             println("QUIZ VM: Saving result: ${result.correctAnswers}/${result.totalQuestions}")
             quizRepository.saveQuizResult(result)
             _navigateToReview.value = quizId
         }
     }
-}
+    }

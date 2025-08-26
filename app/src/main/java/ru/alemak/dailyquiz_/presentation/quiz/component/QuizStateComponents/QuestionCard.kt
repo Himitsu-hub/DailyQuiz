@@ -22,20 +22,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ru.alemak.dailyquiz_.domain.model.Question
+import ru.alemak.dailyquiz_.domain.model.AnsweredQuestion
 import ru.alemak.dailyquiz_.ui.theme.QuestionColor
 
 
 @Composable
 fun QuestionCard(
-    question: Question,
+    answeredQuestion: AnsweredQuestion,   // ← новый параметр
     questionNumber: Int,
     totalQuestions: Int,
     selectedAnswer: String?,
     onAnswerSelected: (String) -> Unit,
     onNextQuestion: () -> Unit,
     modifier: Modifier = Modifier
-) {
+        .fillMaxWidth()
+        .padding(top = 180.dp)
+        .padding(horizontal = 20.dp)
+){
     Card(
         shape = RoundedCornerShape(40.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -64,7 +67,7 @@ fun QuestionCard(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = question.question,
+                    text = answeredQuestion.question.question,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black,
@@ -81,7 +84,7 @@ fun QuestionCard(
                     .padding(top = 120.dp)
             ) {
                 AnswersGrid(
-                    question = question,
+                    options = answeredQuestion.options,
                     selectedAnswer = selectedAnswer,
                     onAnswerSelected = onAnswerSelected,
                     modifier = Modifier

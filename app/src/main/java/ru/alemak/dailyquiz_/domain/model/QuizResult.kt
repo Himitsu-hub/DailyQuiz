@@ -4,7 +4,7 @@ data class QuizResult(
     val quizId: Long,
     val correctAnswers: Int,
     val totalQuestions: Int,
-    val questions: List<Question>,
+    val answeredQuestions: List<AnsweredQuestion>, // ← было questions
     val completedAt: Long
 )
 
